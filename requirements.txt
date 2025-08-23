@@ -1,0 +1,10 @@
+portia-sdk-python[google]
+gitpython
+license-expression
+fastapi
+jinja2
+uvicorn
+pyyaml
+requests
+python-multipart
+aiofiles

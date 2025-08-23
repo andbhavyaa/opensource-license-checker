@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>License Checker</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>OpenSource License & IP Checker</h1>
+        <p>
+          Analyze your dependencies for license compliance, and potential risks.
+        </p>
+      </header>
+
+      {% if show_form %}
+      <div class="upload-section">
+        <h2>Check Your Repository</h2>
+
+        {% if error %}
+        <div class="alert alert-error"><strong>Error:</strong> {{ error }}</div>
+        {% endif %}
+
+        <form
+          action="/analyze"
+          method="post"
+          enctype="multipart/form-data"
+          class="upload-form"
+        >
+          <div class="form-group">
+            <label for="github_url">GitHub Repository URL:</label>
+            <input
+              type="url"
+              id="github_url"
+              name="github_url"
+              placeholder="https://github.com/owner/repo.git"
+              class="form-input"
+            />
+            <small>Or upload a ZIP file below</small>
+          </div>
+
+          <div class="form-group">
+            <label for="zip_file">Upload ZIP File:</label>
+            <input
+              type="file"
+              id="zip_file"
+              name="zip_file"
+              accept=".zip"
+              class="form-input"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Run License Check
+          </button>
+        </form>
+      </div>
+      {% endif %} {% if not show_form and success %}
+      <div class="report-section">
+        <div class="report-header">
+          <h2>📊 License Compliance Report</h2>
+          <div class="source-info"><strong>Source:</strong> {{ source }}</div>
+        </div>
+
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="card-number">
+              {{ report.summary.total_dependencies }}
+            </div>
+            <div class="card-label">Total Dependencies</div>
+          </div>
+
+          <div
+            class="summary-card risk-{{ report.summary.overall_risk.lower() }}"
+          >
+            <div class="card-number">{{ report.summary.overall_risk }}</div>
+            <div class="card-label">Overall Risk</div>
+          </div>
+
+          <div class="summary-card approved">
+            <div class="card-number">{{ report.summary.approved }}</div>
+            <div class="card-label">
+              Approved ({{ report.summary.approved_percentage }}%)
+            </div>
+          </div>
+
+          <div class="summary-card warning">
+            <div class="card-number">{{ report.summary.warning }}</div>
+            <div class="card-label">
+              Warning ({{ report.summary.warning_percentage }}%)
+            </div>
+          </div>
+
+          <div class="summary-card blocked">
+            <div class="card-number">{{ report.summary.blocked }}</div>
+            <div class="card-label">
+              Blocked ({{ report.summary.blocked_percentage }}%)
+            </div>
+          </div>
+        </div>
+
+        <div class="recommendations">
+          <h3>💡 Recommendations</h3>
+          <ul>
+            {% for rec in report.recommendations %}
+            <li>{{ rec }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        {% if report.compliance.risks.high %}
+        <div class="risk-section high-risk">
+          <h3>
+            🚨 High Risk Dependencies ({{ report.compliance.risks.high|length
+            }})
+          </h3>
+          <div class="dependency-list">
+            {% for dep in report.compliance.risks.high %}
+            <div class="dependency-item high">
+              <div class="dep-name">{{ dep.name }}</div>
+              <div class="dep-details">
+                <span class="dep-version">v{{ dep.version }}</span>
+                <span class="dep-license">{{ dep.license }}</span>
+                <span class="dep-reason">{{ dep.risk_reason }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %} {% if report.compliance.risks.medium %}
+        <div class="risk-section medium-risk">
+          <h3>
+            ⚠️ Medium Risk Dependencies ({{
+            report.compliance.risks.medium|length }})
+          </h3>
+          <div class="dependency-list">
+            {% for dep in report.compliance.risks.medium[:10] %}
+            <div class="dependency-item medium">
+              <div class="dep-name">{{ dep.name }}</div>
+              <div class="dep-details">
+                <span class="dep-version">v{{ dep.version }}</span>
+                <span class="dep-license">{{ dep.license }}</span>
+                <span class="dep-reason">{{ dep.risk_reason }}</span>
+              </div>
+            </div>
+            {% endfor %} {% if report.compliance.risks.medium|length > 10 %}
+            <div class="more-items">
+              ... and {{ report.compliance.risks.medium|length - 10 }} more
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="actions">
+          <a href="/" class="btn btn-secondary">🔄 Check Another Repository</a>
+        </div>
+      </div>
+      {% endif %}
+
+      <footer>
+        <p>
+          Built with Portia SDK |
+          <a href="https://github.com">View on GitHub</a>
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // Simple form validation
+      document
+        .querySelector(".upload-form")
+        .addEventListener("submit", function (e) {
+          const githubUrl = document.getElementById("github_url").value;
+          const zipFile = document.getElementById("zip_file").value;
+
+          if (!githubUrl && !zipFile) {
+            e.preventDefault();
+            alert("Please provide either a GitHub URL or upload a ZIP file");
+          }
+        });
+    </script>
+  </body>
+</html>
