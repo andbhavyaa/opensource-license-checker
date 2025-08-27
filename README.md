@@ -660,7 +660,7 @@ This tool itself uses only MIT and Apache-2.0 licensed dependencies to ensure ma
 
 - **[WeMakeDevs](https://wemakedevs.org/)** - For providing the platform and community support that made this project possible. WeMakeDevs has been instrumental in fostering open source development and providing resources for developers to build impactful tools like this.
 
-- **[Portia AI](https://portia.ai/)** - For their expertise in artificial intelligence and machine learning that helped enhance the license detection algorithms. Their contributions in developing the ML models for license classification have significantly improved the accuracy and reliability of this tool.
+- **[Portia AI](https://www.portialabs.ai/)** - For their expertise in artificial intelligence and machine learning that helped enhance the license detection algorithms. Their contributions in developing the ML models for license classification have significantly improved the accuracy and reliability of this tool.
 
 ### Open Source Dependencies
 
